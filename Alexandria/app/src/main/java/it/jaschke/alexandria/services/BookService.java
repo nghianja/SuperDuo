@@ -5,8 +5,11 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +25,7 @@ import java.net.URL;
 import it.jaschke.alexandria.MainActivity;
 import it.jaschke.alexandria.R;
 import it.jaschke.alexandria.data.AlexandriaContract;
+import it.jaschke.alexandria.util.Network;
 
 
 /**
@@ -71,7 +75,6 @@ public class BookService extends IntentService {
      * parameters.
      */
     private void fetchBook(String ean) {
-
         if (ean.length() != 13) {
             return;
         }
@@ -90,6 +93,13 @@ public class BookService extends IntentService {
         }
 
         bookEntry.close();
+
+        // Checks for an internet connection.
+        if (!Network.isNetworkAvailable(this)) {
+            Log.i(LOG_TAG, "No internet connection!");
+            makeToast("No internet connection!");
+            return;
+        }
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
@@ -229,5 +239,22 @@ public class BookService extends IntentService {
             getContentResolver().insert(AlexandriaContract.CategoryEntry.CONTENT_URI, values);
             values = new ContentValues();
         }
+    }
+
+    /**
+     * References:
+     * [1] http://karanbalkar.com/2013/12/displaying-toast-message-in-an-intentservice/
+     * [2] http://stackoverflow.com/questions/27358134/how-to-display-toast-from-a-service-sending-message-to-a-handler-on-a-dead-thre
+     *
+     * @param message
+     */
+    private void makeToast(final String message) {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
