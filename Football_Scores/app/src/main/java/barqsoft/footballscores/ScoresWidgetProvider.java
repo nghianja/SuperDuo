@@ -1,100 +1,65 @@
 package barqsoft.footballscores;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.widget.RemoteViews;
+import android.util.Log;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import barqsoft.footballscores.service.MyFetchService;
+import barqsoft.footballscores.service.ScoresWidgetService;
 
 /**
  * The AppWidgetProvider receives only the event broadcasts that are relevant to the
  * App Widget, such as when the App Widget is updated, deleted, enabled, and disabled.
- * <p/>
+ *
+ * The ScoresWidgetProvider gets all the widgets tied to this provider and builds an
+ * intent to call the service that updates the widgets.
+ *
  * References:
  * [1] http://www.vogella.com/tutorials/AndroidWidgets/article.html
  * [2] http://innovativenetsolutions.com/2013/07/android-tutorial-appwidget-with-its-own-contentprovider-service/
+ * [3] http://stackoverflow.com/questions/23220757/android-widget-onclick-listener-for-several-buttons
  */
 public class ScoresWidgetProvider extends AppWidgetProvider {
 
-    private static int counter = 1;
+    private static final String TAG = "ScoresWidgetProvider";
 
+    public static final String EXTRA_NAME = "barqsoft.footballscores.action";
+    public static final String UPDATE_SCORES = "MyFetchService";
+    public static final String CHANGE_MATCH = "ScoreWidgetService";
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        String action = intent.getStringExtra(EXTRA_NAME);
+        if (action != null) {
+            switch (action) {
+                case UPDATE_SCORES:
+                    Intent service_start = new Intent(context.getApplicationContext(), MyFetchService.class);
+                    context.startService(service_start);
+                    break;
+                case CHANGE_MATCH:
+                    Log.d(TAG, "Clicked for next match");
+                    ScoresWidgetService.counter++;
+                    break;
+            }
+        }
+        super.onReceive(context, intent);
+    }
+
+    @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // RemoteViews attributes
-        int homeCrest = Utilies.getTeamCrestByTeamName(null);
-        String homeName = "Home";
-        String scoreText = "0 - 0";
-        String dataText = "";
-        int awayCrest = Utilies.getTeamCrestByTeamName(null);
-        String awayName = "Away";
-
-        // Get current date
-        String[] currentDate = new String[1];
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date();
-        currentDate[0] = dateFormat.format(date);
-
-        // Get the cursor to a database query
-        Cursor cursor = context.getContentResolver().query(DatabaseContract.scores_table.buildScoreWithDate(), null, null, currentDate, null);
-        boolean hasMatch = (cursor != null && cursor.getCount() > 0);
-
-        if (hasMatch) {
-            cursor.moveToFirst();
-            if (counter > cursor.getCount()) counter = 1;
-            for (int i = 1; i < counter; i++) {
-                cursor.moveToNext();
-            }
-            counter++;
-        }
-
         // Get all ids
-        //ComponentName thisWidget = new ComponentName(context, ScoresWidgetProvider.class);
-        //int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+        ComponentName thisWidget = new ComponentName(context, ScoresWidgetProvider.class);
+        int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
 
-        // Perform this loop procedure for each App Widget
-        for (int widgetId : appWidgetIds) {
-            if (hasMatch) {
-                homeCrest = Utilies.getTeamCrestByTeamName(cursor.getString(ScoresAdapter.COL_HOME));
-                homeName = cursor.getString(ScoresAdapter.COL_HOME);
-                scoreText = Utilies.getScores(cursor.getInt(ScoresAdapter.COL_HOME_GOALS), cursor.getInt(ScoresAdapter.COL_AWAY_GOALS));
-                dataText = cursor.getString(ScoresAdapter.COL_MATCHTIME);
-                awayCrest = Utilies.getTeamCrestByTeamName(cursor.getString(ScoresAdapter.COL_AWAY));
-                awayName = cursor.getString(ScoresAdapter.COL_AWAY);
+        // Build the intent to call the service
+        Intent intent = new Intent(context.getApplicationContext(), ScoresWidgetService.class);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
 
-                if (cursor.isLast()) {
-                    cursor.moveToFirst();
-                } else {
-                    cursor.moveToNext();
-                }
-            }
-
-            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.scores_list_item);
-
-            // Set the texts and images
-            remoteViews.setImageViewResource(R.id.home_crest, homeCrest);
-            remoteViews.setTextViewText(R.id.home_name, homeName);
-            remoteViews.setTextViewText(R.id.score_textview, scoreText);
-            remoteViews.setTextViewText(R.id.data_textview, dataText);
-            remoteViews.setImageViewResource(R.id.away_crest, awayCrest);
-            remoteViews.setTextViewText(R.id.away_name, awayName);
-
-            // Register an onClickListener
-            Intent intent = new Intent(context, ScoresWidgetProvider.class);
-            intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
-
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.score_textview, pendingIntent);
-
-            // Tell the AppWidgetManager to perform an update on the current app widget
-            appWidgetManager.updateAppWidget(widgetId, remoteViews);
-        }
-
-        cursor.close();
+        // Update the widgets via the service
+        context.startService(intent);
     }
 
 }
