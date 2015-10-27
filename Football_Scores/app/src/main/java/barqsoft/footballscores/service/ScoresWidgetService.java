@@ -19,7 +19,7 @@ import barqsoft.footballscores.Utilies;
 
 /**
  * This service gets football scores from the database in a cursor and updates the widget views.
- *
+ * <p/>
  * References:
  * [1] http://www.vogella.com/tutorials/AndroidWidgets/article.html
  * [2] http://innovativenetsolutions.com/2013/07/android-tutorial-appwidget-with-its-own-contentprovider-service/
@@ -77,7 +77,7 @@ public class ScoresWidgetService extends Service {
                 }
             }
 
-            RemoteViews remoteViews = new RemoteViews(this.getApplicationContext().getPackageName(), R.layout.scores_list_item);
+            RemoteViews remoteViews = new RemoteViews(this.getApplicationContext().getPackageName(), R.layout.scores_widget);
 
             // Set the texts and images
             remoteViews.setImageViewResource(R.id.home_crest, homeCrest);
@@ -87,14 +87,22 @@ public class ScoresWidgetService extends Service {
             remoteViews.setImageViewResource(R.id.away_crest, awayCrest);
             remoteViews.setTextViewText(R.id.away_name, awayName);
 
-            // Register an onClickListener
-            Intent clickIntent = new Intent(this.getApplicationContext(), ScoresWidgetProvider.class);
-            clickIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-            clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
-            clickIntent.putExtra(ScoresWidgetProvider.EXTRA_NAME, ScoresWidgetProvider.CHANGE_MATCH);
+            // Register a onClickListener
+            Intent clickIntent1 = new Intent(this.getApplicationContext(), ScoresWidgetProvider.class);
+            clickIntent1.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            clickIntent1.putExtra(ScoresWidgetProvider.CHANGE_MATCH, true);
+            clickIntent1.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
 
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            remoteViews.setOnClickPendingIntent(R.id.score_textview, pendingIntent);
+            PendingIntent pendingIntent1 = PendingIntent.getBroadcast(this.getApplicationContext(), 1, clickIntent1, PendingIntent.FLAG_UPDATE_CURRENT);
+            remoteViews.setOnClickPendingIntent(R.id.next_button, pendingIntent1);
+
+            Intent clickIntent2 = new Intent(this.getApplicationContext(), ScoresWidgetProvider.class);
+            clickIntent2.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            clickIntent2.putExtra(ScoresWidgetProvider.UPDATE_SCORES, true);
+            clickIntent2.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
+
+            PendingIntent pendingIntent2 = PendingIntent.getBroadcast(this.getApplicationContext(), 2, clickIntent2, PendingIntent.FLAG_UPDATE_CURRENT);
+            remoteViews.setOnClickPendingIntent(R.id.sync_button, pendingIntent2);
 
             // Tell the AppWidgetManager to perform an update on the current app widget
             appWidgetManager.updateAppWidget(widgetId, remoteViews);
