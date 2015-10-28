@@ -41,7 +41,9 @@ References:
 
         <service android:name=".service.MyFetchService" />
 
-        <receiver android:name=".ScoresWidgetProvider">
+        <receiver
+            android:name=".ScoresWidgetProvider"
+            android:label="Normal Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -51,6 +53,22 @@ References:
         </receiver>
 
         <service android:name=".service.ScoresWidgetService" />
+
+        <receiver
+            android:name=".ScoresStackWidgetProvider"
+            android:label="Stack Widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/scores_appwidget_stack" />
+        </receiver>
+
+        <service
+            android:name=".service.ScoresStackWidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

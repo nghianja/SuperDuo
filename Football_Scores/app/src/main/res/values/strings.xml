@@ -24,6 +24,7 @@
     <string name="share_text">Share</string>
     <string name="next_text">Next</string>
     <string name="update_text">Update</string>
+    <string name="empty_view_text">Empty</string>
     <string name="about">About</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="about_text">
