@@ -32,7 +32,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     private String bookTitle;
     private ShareActionProvider shareActionProvider;
 
-    public BookDetail(){
+    public BookDetail() {
     }
 
     @Override
@@ -99,7 +99,9 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text) + bookTitle);
-        shareActionProvider.setShareIntent(shareIntent);
+        if (shareActionProvider != null) {
+            shareActionProvider.setShareIntent(shareIntent);
+        }
 
         String bookSubTitle = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.SUBTITLE));
         if (bookSubTitle != null) {
@@ -119,7 +121,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         }
 
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
-        if (imgUrl != null && Patterns.WEB_URL.matcher(imgUrl).matches()){
+        if (imgUrl != null && Patterns.WEB_URL.matcher(imgUrl).matches()) {
             new DownloadImage((ImageView) rootView.findViewById(R.id.fullBookCover)).execute(imgUrl);
             rootView.findViewById(R.id.fullBookCover).setVisibility(View.VISIBLE);
         }
@@ -128,11 +130,6 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
         if (categories != null) {
             ((TextView) rootView.findViewById(R.id.categories)).setText(categories);
         }
-
-        if(rootView.findViewById(R.id.right_container)!=null){
-            rootView.findViewById(R.id.backButton).setVisibility(View.INVISIBLE);
-        }
-
     }
 
     @Override
@@ -143,7 +140,7 @@ public class BookDetail extends Fragment implements LoaderManager.LoaderCallback
     @Override
     public void onPause() {
         super.onDestroyView();
-        if(MainActivity.IS_TABLET && rootView.findViewById(R.id.right_container)==null){
+        if (MainActivity.IS_TABLET && rootView.findViewById(R.id.right_container) == null) {
             getActivity().getSupportFragmentManager().popBackStack();
         }
     }

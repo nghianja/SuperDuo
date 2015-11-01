@@ -15,7 +15,7 @@ import barqsoft.footballscores.DatabaseContract;
 import barqsoft.footballscores.R;
 import barqsoft.footballscores.ScoresAdapter;
 import barqsoft.footballscores.ScoresWidgetProvider;
-import barqsoft.footballscores.Utilies;
+import barqsoft.footballscores.Utilities;
 
 /**
  * This service gets football scores from the database in a cursor and updates the widget views.
@@ -31,11 +31,11 @@ public class ScoresWidgetService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // RemoteViews attributes
-        int homeCrest = Utilies.getTeamCrestByTeamName(null);
+        int homeCrest = Utilities.getTeamCrestByTeamName(null);
         String homeName = "Home";
         String scoreText = "0 - 0";
         String dataText = "";
-        int awayCrest = Utilies.getTeamCrestByTeamName(null);
+        int awayCrest = Utilities.getTeamCrestByTeamName(null);
         String awayName = "Away";
 
         // Get current date
@@ -63,11 +63,11 @@ public class ScoresWidgetService extends Service {
         // Perform this loop procedure for each App Widget
         for (int widgetId : allWidgetIds) {
             if (hasMatch) {
-                homeCrest = Utilies.getTeamCrestByTeamName(cursor.getString(ScoresAdapter.COL_HOME));
+                homeCrest = Utilities.getTeamCrestByTeamName(cursor.getString(ScoresAdapter.COL_HOME));
                 homeName = cursor.getString(ScoresAdapter.COL_HOME);
-                scoreText = Utilies.getScores(cursor.getInt(ScoresAdapter.COL_HOME_GOALS), cursor.getInt(ScoresAdapter.COL_AWAY_GOALS));
+                scoreText = Utilities.getScores(cursor.getInt(ScoresAdapter.COL_HOME_GOALS), cursor.getInt(ScoresAdapter.COL_AWAY_GOALS));
                 dataText = cursor.getString(ScoresAdapter.COL_MATCHTIME);
-                awayCrest = Utilies.getTeamCrestByTeamName(cursor.getString(ScoresAdapter.COL_AWAY));
+                awayCrest = Utilities.getTeamCrestByTeamName(cursor.getString(ScoresAdapter.COL_AWAY));
                 awayName = cursor.getString(ScoresAdapter.COL_AWAY);
 
                 if (cursor.isLast()) {

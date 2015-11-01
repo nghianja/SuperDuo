@@ -16,7 +16,7 @@ import barqsoft.footballscores.DatabaseContract;
 import barqsoft.footballscores.R;
 import barqsoft.footballscores.ScoresAdapter;
 import barqsoft.footballscores.ScoresWidgetItem;
-import barqsoft.footballscores.Utilies;
+import barqsoft.footballscores.Utilities;
 
 /**
  * This service class is for a collection view widget that supports the usage of a StackView.
@@ -58,11 +58,11 @@ public class ScoresStackWidgetService extends RemoteViewsService {
                 cursor.moveToNext();
 
                 ScoresWidgetItem scoresWidgetItem = new ScoresWidgetItem();
-                scoresWidgetItem.homeCrest = Utilies.getTeamCrestByTeamName(cursor.getString(ScoresAdapter.COL_HOME));
+                scoresWidgetItem.homeCrest = Utilities.getTeamCrestByTeamName(cursor.getString(ScoresAdapter.COL_HOME));
                 scoresWidgetItem.homeName = cursor.getString(ScoresAdapter.COL_HOME);
-                scoresWidgetItem.scoreText = Utilies.getScores(cursor.getInt(ScoresAdapter.COL_HOME_GOALS), cursor.getInt(ScoresAdapter.COL_AWAY_GOALS));
+                scoresWidgetItem.scoreText = Utilities.getScores(cursor.getInt(ScoresAdapter.COL_HOME_GOALS), cursor.getInt(ScoresAdapter.COL_AWAY_GOALS));
                 scoresWidgetItem.dataText = cursor.getString(ScoresAdapter.COL_MATCHTIME);
-                scoresWidgetItem.awayCrest = Utilies.getTeamCrestByTeamName(cursor.getString(ScoresAdapter.COL_AWAY));
+                scoresWidgetItem.awayCrest = Utilities.getTeamCrestByTeamName(cursor.getString(ScoresAdapter.COL_AWAY));
                 scoresWidgetItem.awayName = cursor.getString(ScoresAdapter.COL_AWAY);
                 scoresWidgetItem.matchId = cursor.getInt(ScoresAdapter.COL_ID);
 

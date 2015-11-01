@@ -14,11 +14,11 @@ public class ScoresWidgetItem {
     public int matchId;
 
     public ScoresWidgetItem() {
-        homeCrest = Utilies.getTeamCrestByTeamName(null);
+        homeCrest = Utilities.getTeamCrestByTeamName(null);
         homeName = "Home";
         scoreText = "0 - 0";
         dataText = "";
-        awayCrest = Utilies.getTeamCrestByTeamName(null);
+        awayCrest = Utilities.getTeamCrestByTeamName(null);
         awayName = "Away";
         matchId = 0;
     }
